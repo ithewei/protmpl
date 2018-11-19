@@ -1,0 +1,20 @@
+# cache
+*~
+*.old
+*.new
+*.org
+*.bk
+*.bak
+
+# IDE
+*.vs
+*.vscode
+*.user
+*.VC.db
+*.VC.opendb
+
+# output
+*.o
+build
+bin
+
