@@ -1,26 +1,30 @@
-
-CC = gcc
-CXX = g++
-
 MKDIR = mkdir -p
 RM = rm -r
 CP = cp -r
 
-CFLAGS += -g -Wall -O3 
+CFLAGS += -g -Wall -O3
+ENABLE_SHARED=true
+ifeq ($(ENABLE_SHARED),true)
+	CFLAGS += -shared -fPIC
+endif
 CXXFLAGS += $(CFLAGS) -std=c++11
+ARFLAGS := cr
 
 INCDIR = include
 LIBDIR = lib
 SRCDIR = src
 BINDIR = bin
 DEPDIR = 3rd
+CONFDIR = conf
+DISTDIR = dist
 
 TARGET = test
 ifeq ($(OS),Windows_NT)
 TARGET := $(addsuffix .exe, $(TARGET))
 endif
 
-DIRS += . $(SRCDIR) test
+DIRS += . test
+DIRS += $(shell find $(SRCDIR) -type d)
 SRCS += $(foreach dir, $(DIRS), $(wildcard $(dir)/*.c $(dir)/*.cc $(dir)/*.cpp))
 #OBJS := $(patsubst %.cpp, %.o, $(SRCS))
 OBJS := $(addsuffix .o, $(basename $(SRCS)))
@@ -35,7 +39,8 @@ CPPFLAGS += $(addprefix -I, $(INCDIRS))
 
 LIBDIRS += $(LIBDIR) $(DEPDIR)/lib
 LDFLAGS += $(addprefix -L, $(LIBDIRS))
-LDFLAGS += -lpthread
+#LDFLAGS += -Wl,-Bstatic  -luv
+#LDFLAGS += -Wl,-Bdynamic -lm -lz -lpthread
 
 $(info MAKE=$(MAKE))
 $(info CC=$(CC))
@@ -50,19 +55,25 @@ default: all
 all: prepare $(TARGET)
 
 prepare:
-	$(MKDIR) $(BINDIR)
+	$(MKDIR) $(BINDIR) $(LIBDIR)
 
 $(TARGET): $(OBJS)
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $^ -o $(BINDIR)/$@ $(LDFLAGS)
+	$(CXX) $^ -o $(BINDIR)/$@ $(LDFLAGS)
+	#$(CXX) $(CXXFLAGS) $^ -o $(LIBDIR)/$@ $(LDFLAGS)
+	#$(AR)  $(ARFLAGS) $(LIBDIR)/$@ $^
 
 clean:
 	$(RM) $(OBJS)
 	$(RM) $(BINDIR)
-    
+	$(RM) $(LIBDIR)
+
 install:
 
 uninstall:
-    
-.PHONY: default all prepare clean install uninstall
 
+dist:
+	$(MKDIR) $(DISTDIR)
+	$(CP) $(BINDIR) $(LIBDIR) $(DISTDIR)
+
+.PHONY: default all prepare clean install uninstall dist
 

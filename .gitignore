@@ -2,7 +2,6 @@
 *~
 *.old
 *.new
-*.org
 *.bk
 *.bak
 
@@ -10,11 +9,17 @@
 *.vs
 *.vscode
 *.user
+*.filters
 *.VC.db
 *.VC.opendb
+tags
+cscope*
+.ycm*
 
 # output
 *.o
+*.log
 build
 bin
+lib
 
